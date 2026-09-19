@@ -1,0 +1,25 @@
+{
+  "name": "echo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sergey-Hakobyan/Echo-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Sergey-Hakobyan/Echo-/issues"
+  },
+  "homepage": "https://github.com/Sergey-Hakobyan/Echo-#readme",
+  "devDependencies": {
+    "electron": "^44.4.3"
+  }
+}
