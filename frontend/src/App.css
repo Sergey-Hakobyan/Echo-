@@ -24,23 +24,13 @@ body {
   background: #08090b;
 }
 
-.sphere {
-  width: 350px;
-  height: 350px;
-  border-radius: 50%;
-  border: 1px solid rgba(220, 235, 255, 0.7);
-  box-shadow:
-    0 0 20px rgba(200, 220, 255, 0.35),
-    0 0 60px rgba(200, 220, 255, 0.15);
+.particle-sphere {
+  width: 600px;
+  height: 600px;
 }
 
-.core {
+.particle-sphere canvas {
+  display: block;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(220, 235, 255, 0.08),
-    transparent 65%
-  );
 }

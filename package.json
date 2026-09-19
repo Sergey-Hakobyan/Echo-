@@ -1,25 +1,15 @@
 {
   "name": "echo",
   "version": "1.0.0",
-  "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron ."
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Sergey-Hakobyan/Echo-.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Sergey-Hakobyan/Echo-/issues"
-  },
-  "homepage": "https://github.com/Sergey-Hakobyan/Echo-#readme",
-  "devDependencies": {
-    "electron": "^44.4.3"
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "dotenv": "^17.0.0",
+    "electron": "^37.0.0",
+    "openai": "^5.0.0",
+    "three": "^0.186.0"
   }
 }

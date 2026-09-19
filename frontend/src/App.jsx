@@ -1,13 +1,11 @@
 import "./App.css";
+import Sphere from "./components/Sphere/Sphere";
 
 function App() {
-
   return (
-    <div className="app">
-      <div className="sphere">о
-        <div className="core"></div>
-      </div>
-    </div>
+    <main className="app">
+      <Sphere />
+    </main>
   );
 }
 
