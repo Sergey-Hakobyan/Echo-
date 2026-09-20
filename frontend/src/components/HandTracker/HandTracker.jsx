@@ -12,6 +12,18 @@ function distance(a, b) {
   );
 }
 
+function getGrabPoint(hand) {
+  const thumb = hand[4];
+  const index = hand[8];
+  const middle = hand[12];
+
+  return {
+    x: (thumb.x + index.x + middle.x) / 3,
+    y: (thumb.y + index.y + middle.y) / 3,
+    z: (thumb.z + index.z + middle.z) / 3,
+  };
+}
+
 function HandTracker({ onOpennessChange = () => {} }) {
   const videoRef = useRef(null);
 
@@ -20,19 +32,26 @@ function HandTracker({ onOpennessChange = () => {} }) {
 
     async function startCamera() {
       try {
-        const vision = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm"
-        );
+        const vision =
+          await FilesetResolver.forVisionTasks(
+            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm"
+          );
 
         const handLandmarker =
-          await HandLandmarker.createFromOptions(vision, {
-            baseOptions: {
-              modelAssetPath:
-                "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
-            },
-            runningMode: "VIDEO",
-            numHands: 1,
-          });
+          await HandLandmarker.createFromOptions(
+            vision,
+            {
+              baseOptions: {
+                modelAssetPath:
+                  "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+              },
+
+              runningMode: "VIDEO",
+
+              // Теперь ищем две руки
+              numHands: 2,
+            }
+          );
 
         const stream =
           await navigator.mediaDevices.getUserMedia({
@@ -50,60 +69,60 @@ function HandTracker({ onOpennessChange = () => {} }) {
               performance.now()
             );
 
-          if (results.landmarks.length > 0) {
-            const hand = results.landmarks[0];
+          // Нам нужны ОБЕ руки
+          if (results.landmarks.length === 2) {
+            const leftHand =
+              results.landmarks[0];
 
-            const wrist = hand[0];
+            const rightHand =
+              results.landmarks[1];
 
-            const indexTip = hand[8];
-            const middleTip = hand[12];
-            const ringTip = hand[16];
-            const pinkyTip = hand[20];
+            // Точка, за которую условно
+            // "держим" сферу каждой рукой
+            const leftPoint =
+              getGrabPoint(leftHand);
 
-            const indexDistance = distance(
-              wrist,
-              indexTip
-            );
+            const rightPoint =
+              getGrabPoint(rightHand);
 
-            const middleDistance = distance(
-              wrist,
-              middleTip
-            );
+            // Расстояние между руками
+            const handDistance =
+              distance(
+                leftPoint,
+                rightPoint
+              );
 
-            const ringDistance = distance(
-              wrist,
-              ringTip
-            );
-
-            const pinkyDistance = distance(
-              wrist,
-              pinkyTip
-            );
-
-            const openness =
-              (indexDistance +
-                middleDistance +
-                ringDistance +
-                pinkyDistance) /
-              4;
-
-            const min = 0.15;
-            const max = 0.5;
+            // Настройка диапазона
+            const minDistance = 0.25;
+            const maxDistance = 0.8;
 
             const normalized =
-              (openness - min) /
-              (max - min);
+              (handDistance -
+                minDistance) /
+              (maxDistance -
+                minDistance);
 
-            const clamped = Math.max(
-              0,
-              Math.min(1, normalized)
-            );
+            const clamped =
+              Math.max(
+                0,
+                Math.min(1, normalized)
+              );
 
+            // Обновляем размер только когда
+            // видны обе руки
             onOpennessChange(clamped);
           }
 
+          // Если рук меньше двух —
+          // НИЧЕГО не делаем.
+          //
+          // Поэтому последнее значение
+          // размера сохраняется.
+
           animationId =
-            requestAnimationFrame(detectHands);
+            requestAnimationFrame(
+              detectHands
+            );
         }
 
         detectHands();
@@ -123,20 +142,22 @@ function HandTracker({ onOpennessChange = () => {} }) {
       if (videoRef.current?.srcObject) {
         videoRef.current.srcObject
           .getTracks()
-          .forEach((track) => track.stop());
+          .forEach((track) =>
+            track.stop()
+          );
       }
     };
   }, [onOpennessChange]);
 
-    return (
+  return (
     <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        style={{ display: "none" }}
+      ref={videoRef}
+      autoPlay
+      playsInline
+      muted
+      style={{ display: "none" }}
     />
-    );
-    }
+  );
+}
 
 export default HandTracker;
