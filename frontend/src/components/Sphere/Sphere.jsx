@@ -1,8 +1,14 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-function Sphere() {
+function Sphere({ openness = 0 }) {
   const containerRef = useRef(null);
+
+  // Храним актуальное значение openness
+  // без пересоздания Three.js
+  const opennessRef = useRef(openness);
+
+  opennessRef.current = openness;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -23,7 +29,9 @@ function Sphere() {
       alpha: true,
     });
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio, 2)
+    );
 
     renderer.setSize(
       container.clientWidth,
@@ -92,14 +100,40 @@ function Sphere() {
 
     let animationId;
 
+    // Текущий размер сферы
+    let currentScale = 0.6;
+
     function animate() {
       animationId =
         requestAnimationFrame(animate);
 
+      // Скорость вращения ВСЕГДА одинаковая
       sphere.rotation.y += 0.0015;
       sphere.rotation.x += 0.0003;
 
-      renderer.render(scene, camera);
+      const minScale = 0.6;
+      const maxScale = 1.5;
+
+      const targetScale =
+        minScale +
+        (maxScale - minScale) *
+          opennessRef.current;
+
+      // Плавно приближаем текущий размер
+      // к размеру, который задаёт рука
+      currentScale +=
+        (targetScale - currentScale) * 0.09;
+
+      sphere.scale.set(
+        currentScale,
+        currentScale,
+        currentScale
+      );
+
+      renderer.render(
+        scene,
+        camera
+      );
     }
 
     animate();

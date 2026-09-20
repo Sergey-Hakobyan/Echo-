@@ -7,8 +7,9 @@
   },
   "dependencies": {
     "@google/genai": "^1.0.0",
+    "@mediapipe/tasks-vision": "^1.0.1",
     "dotenv": "^17.0.0",
-    "electron": "^37.0.0",
+    "electron": "^44.4.3",
     "openai": "^5.0.0",
     "three": "^0.186.0"
   }
