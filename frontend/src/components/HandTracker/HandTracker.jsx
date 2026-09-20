@@ -160,4 +160,5 @@ function HandTracker({ onOpennessChange = () => {} }) {
   );
 }
 
+
 export default HandTracker;
