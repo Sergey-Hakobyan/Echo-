@@ -1,14 +1,17 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-function Sphere({ openness = 0 }) {
+function Sphere({
+  openness = 0,
+  rotation = 0,
+}) {
   const containerRef = useRef(null);
 
-  // Храним актуальное значение openness
-  // без пересоздания Three.js
   const opennessRef = useRef(openness);
+  const rotationRef = useRef(rotation);
 
   opennessRef.current = openness;
+  rotationRef.current = rotation;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -17,17 +20,19 @@ function Sphere({ openness = 0 }) {
 
     const camera = new THREE.PerspectiveCamera(
       60,
-      container.clientWidth / container.clientHeight,
+      container.clientWidth /
+        container.clientHeight,
       0.1,
       100
     );
 
     camera.position.z = 4;
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-    });
+    const renderer =
+      new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+      });
 
     renderer.setPixelRatio(
       Math.min(window.devicePixelRatio, 2)
@@ -38,15 +43,19 @@ function Sphere({ openness = 0 }) {
       container.clientHeight
     );
 
-    container.appendChild(renderer.domElement);
+    container.appendChild(
+      renderer.domElement
+    );
 
-    const geometry = new THREE.BufferGeometry();
+    const geometry =
+      new THREE.BufferGeometry();
 
     const particles = 6000;
 
-    const positions = new Float32Array(
-      particles * 3
-    );
+    const positions =
+      new Float32Array(
+        particles * 3
+      );
 
     for (let i = 0; i < particles; i++) {
       const radius = 1.35;
@@ -57,23 +66,19 @@ function Sphere({ openness = 0 }) {
       const phi =
         Math.acos(2 * Math.random() - 1);
 
-      const x =
+      positions[i * 3] =
         radius *
         Math.sin(phi) *
         Math.cos(theta);
 
-      const y =
+      positions[i * 3 + 1] =
         radius *
         Math.sin(phi) *
         Math.sin(theta);
 
-      const z =
+      positions[i * 3 + 2] =
         radius *
         Math.cos(phi);
-
-      positions[i * 3] = x;
-      positions[i * 3 + 1] = y;
-      positions[i * 3 + 2] = z;
     }
 
     geometry.setAttribute(
@@ -84,33 +89,48 @@ function Sphere({ openness = 0 }) {
       )
     );
 
-    const material = new THREE.PointsMaterial({
-      color: 0xdceaff,
-      size: 0.012,
-      transparent: true,
-      opacity: 0.9,
-    });
+    const material =
+      new THREE.PointsMaterial({
+        color: 0xdceaff,
+        size: 0.012,
+        transparent: true,
+        opacity: 0.9,
+      });
 
-    const sphere = new THREE.Points(
-      geometry,
-      material
-    );
+    const sphere =
+      new THREE.Points(
+        geometry,
+        material
+      );
 
     scene.add(sphere);
 
     let animationId;
 
-    // Текущий размер сферы
     let currentScale = 0.6;
+
+    let manualRotation = 0;
 
     function animate() {
       animationId =
-        requestAnimationFrame(animate);
+        requestAnimationFrame(
+          animate
+        );
 
-      // Скорость вращения ВСЕГДА одинаковая
-      sphere.rotation.y += 0.0015;
-      sphere.rotation.x += 0.0003;
+      // Обычное медленное вращение
+      manualRotation += 0.0015;
 
+      // Вращение руками
+      manualRotation +=
+        rotationRef.current;
+
+      sphere.rotation.y =
+        manualRotation;
+
+      sphere.rotation.x +=
+        0.0003;
+
+      // Размер
       const minScale = 0.6;
       const maxScale = 1.5;
 
@@ -119,10 +139,10 @@ function Sphere({ openness = 0 }) {
         (maxScale - minScale) *
           opennessRef.current;
 
-      // Плавно приближаем текущий размер
-      // к размеру, который задаёт рука
       currentScale +=
-        (targetScale - currentScale) * 0.09;
+        (targetScale -
+          currentScale) *
+        0.05;
 
       sphere.scale.set(
         currentScale,
